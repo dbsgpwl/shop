@@ -43,4 +43,17 @@ public class AccountController {
         throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
 
+
+    @GetMapping("/api/account/check")
+    public ResponseEntity check(@CookieValue(value = "token", required = false) String token){
+        Claims claims = jwtService.getClaims(token);    // 토큰 값 받아오기
+
+        if(claims != null){
+            int id = Integer.parseInt(claims.get("id").toString()); // 토큰 값 파싱
+            return new ResponseEntity<>(id, HttpStatus.OK); // id값을 응답값으로 준다.
+
+        }
+
+        return new ResponseEntity<>(null, HttpStatus.OK); // claims 값이 null이라면, header에 null값을 반환
+    }
 }
