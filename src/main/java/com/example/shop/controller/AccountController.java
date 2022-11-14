@@ -43,12 +43,25 @@ public class AccountController {
         throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
 
+    @PostMapping("/api/account/logout") //params라는 이름으로 인자값을 받아서, findby 매서드에 넘겨서 id값 리턴
+    public ResponseEntity logout(HttpServletResponse res) {
+
+        Cookie cookie = new Cookie("token", null);
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+
+        res.addCookie(cookie);
+
+
+        return new ResponseEntity<>(HttpStatus.OK);
+
+    }
 
     @GetMapping("/api/account/check")
-    public ResponseEntity check(@CookieValue(value = "token", required = false) String token){
+    public ResponseEntity check(@CookieValue(value = "token", required = false) String token) {
         Claims claims = jwtService.getClaims(token);    // 토큰 값 받아오기
 
-        if(claims != null){
+        if (claims != null) {
             int id = Integer.parseInt(claims.get("id").toString()); // 토큰 값 파싱
             return new ResponseEntity<>(id, HttpStatus.OK); // id값을 응답값으로 준다.
 
