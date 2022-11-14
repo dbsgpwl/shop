@@ -14,6 +14,7 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+
     @Column(nullable = false)
     private int memberId;
 
@@ -27,9 +28,8 @@ public class Order {
     private String payment;
 
     @Column(length = 16)
-    private String card_number;
+    private String cardNumber;
 
     @Column(length = 500, nullable = false)
     private String items;
-
 }
