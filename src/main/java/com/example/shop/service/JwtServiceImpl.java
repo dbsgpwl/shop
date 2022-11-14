@@ -58,7 +58,8 @@ public class JwtServiceImpl implements JwtService{
 
     @Override
     public boolean isValid(String token) {
-        return this.getClaims(token) != null;
+
+        return this.getClaims(token) != null;   // 토큰값이 null이 아니라면, 문제 없음(회원id 정상 처리 완료)
     }
 
     @Override
