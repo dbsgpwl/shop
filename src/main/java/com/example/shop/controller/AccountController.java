@@ -1,15 +1,17 @@
 package com.example.shop.controller;
 
-import com.example.shop.entity.Item;
 import com.example.shop.entity.Member;
-import com.example.shop.repository.ItemRepository;
 import com.example.shop.repository.MemberRepository;
+import com.example.shop.service.JwtService;
+import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 @RestController
@@ -18,15 +20,27 @@ public class AccountController {
     @Autowired
     MemberRepository memberRepository;
 
-    @GetMapping("/api/account/login")
-    public int login(
-            @RequestBody Map<String, String> params
-    ) {
+    @Autowired
+    JwtService jwtService;
+
+    @PostMapping("/api/account/login") //params라는 이름으로 인자값을 받아서, findby 매서드에 넘겨서 id값 리턴
+    public ResponseEntity login(@RequestBody Map<String, String> params,
+                                HttpServletResponse res) {
         Member member = memberRepository.findByEmailAndPassword(params.get("email"), params.get("password"));
 
         if (member != null) {
-            return member.getId();
+            int id = member.getId();                // 1. id 값을 받아온다.
+            String token = jwtService.getToken("id", id); // 2. 받아온 id 값을 토큰화(string) 한다.
+
+            Cookie cookie = new Cookie("token", token); // 3. 토큰화된 id값을 cookie에 저장한다.
+            cookie.setHttpOnly(true); // js로는 접근 할 수 없도록 처리 (setHttpOnly 매서드 활용)
+            cookie.setPath("/");
+
+            res.addCookie(cookie);  // 추가된 쿠키값을 response 변수에 넘겨 응답한다.
+
+            return new ResponseEntity<>(id, HttpStatus.OK); // id값을 응답값으로 준다.
         }
-        return 0;
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
+
 }
