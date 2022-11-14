@@ -9,4 +9,7 @@ public interface CartRepository extends JpaRepository<Cart, Integer> {
 
     List<Cart> findByMemberId(int memberId);    // 회원 id에 있는 카트 정보 가져오기
     Cart findByMemberIdAndItemId(int memberId, int itemId); // 회원 id와 상품 id 가져오기
+
+    // 장바구니 비우기
+    void deleteByMemberId(int memberId);
 }
